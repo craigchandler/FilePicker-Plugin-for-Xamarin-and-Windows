@@ -52,6 +52,24 @@ namespace Plugin.FilePicker
             return new FileData(file.Path, file.Name, () => file.OpenStreamForReadAsync().Result);
         }
 
+        public async Task<FileData> PickFolder()
+        {
+            var picker = new Windows.Storage.Pickers.FolderPicker()
+            {
+                ViewMode = Windows.Storage.Pickers.PickerViewMode.List,
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary
+            };
+            picker.FileTypeFilter.Add("*");
+
+            var folder = await picker.PickSingleFolderAsync();
+            if (null == folder)
+                return null;
+
+            StorageApplicationPermissions.FutureAccessList.Add(folder);
+            //return folder;
+            return new FileData(folder.Path, null, null);
+        }
+
         public async Task<bool> SaveFile(FileData fileToSave)
         {
             try
